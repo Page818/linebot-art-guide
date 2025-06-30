@@ -13,6 +13,7 @@
 - 也可以輸入特定地點名稱（例如「台北」、「泰山」等），查詢該地區的公共藝術。
 
 ---
+####以下備忘
 ####  專案架構
 
 - **前端接口**：LINE Bot 互動（文字、定位、選單）
@@ -22,9 +23,6 @@
 #### Proxy Server
 
 > Render 部署中，我還在等待 render 成功顯示 `Proxy server running at...`
-
-**預期運作連結：**  
-[https://zero630proxy.onrender.com/proxy?url=https://publicartap.moc.gov.tw/data/api/artWork/openData](https://zero630proxy.onrender.com/proxy?url=https://publicartap.moc.gov.tw/data/api/artWork/openData)
 
 ####  目錄
 
