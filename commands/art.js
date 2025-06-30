@@ -24,6 +24,7 @@ async function fetchArtDataWithPuppeteer() {
   const browser = await puppeteer.launch({
     headless: true,
     args: ['--no-sandbox', '--disable-setuid-sandbox'],
+    executablePath: puppeteer.executablePath(),
   })
   try {
     const page = await browser.newPage()
