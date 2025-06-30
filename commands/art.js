@@ -3,6 +3,22 @@ import puppeteer from 'puppeteer'
 import { distance } from '../utils/distance.js'
 import template from '../templates/art.js'
 import fs from 'fs'
+import { execSync } from 'child_process'
+
+// 先檢查環境裡 Chrome 路徑和版本
+try {
+  const chromePath = execSync('which google-chrome').toString().trim()
+  console.log('Chrome path:', chromePath)
+} catch {
+  console.log('Google Chrome not found')
+}
+
+try {
+  const chromeVersion = execSync('google-chrome --version').toString().trim()
+  console.log('Chrome version:', chromeVersion)
+} catch {
+  console.log('Cannot get Chrome version')
+}
 
 async function fetchArtDataWithPuppeteer() {
   const browser = await puppeteer.launch({
