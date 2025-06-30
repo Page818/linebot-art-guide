@@ -1,0 +1,85 @@
+import axios from 'axios'
+import { distance } from '../utils/distance.js'
+import template from '../templates/art.js'
+import fs from 'fs'
+
+export default async (event, keyword = null) => {
+  try {
+    const { data } = await axios.get('https://publicartap.moc.gov.tw/data/api/artWork/openData')
+    let filtered = []
+
+    if (keyword) {
+      filtered = data.filter((value) => {
+        const fullAddress = (value.縣市 + value.設置地點).toLowerCase()
+        return fullAddress.includes(keyword.toLowerCase())
+      })
+    } else {
+      filtered = data
+        .map((value) => {
+          value.distance = distance(
+            value.緯度,
+            value.經度,
+            event.message.latitude,
+            event.message.longitude,
+            'K',
+          )
+          return value
+        })
+        .sort((a, b) => {
+          return a.distance - b.distance
+        })
+    }
+
+    const bubbles = filtered.slice(0, 5).map((value) => {
+      const address = value.縣市 + value.設置地點
+      const url = `https://www.google.com/maps/search/?api=1&query=${value['緯度']},${value['經度']}`
+      const bubble = template()
+      bubble.hero.url = value.主圖
+      bubble.hero.action.uri = url
+      bubble.body.contents[0].text = value.作品名稱
+      bubble.body.contents[1].contents[0].contents[1].text = value.作者
+      bubble.body.contents[1].contents[1].contents[1].text = value.作品說明
+      bubble.body.contents[1].contents[2].contents[1].text = value.作品材質
+      // bubble.body.contents[1].contents[3].contents[1].text = value.設置地點
+      bubble.body.contents[1].contents[3].contents[0].contents[1].text = address
+      bubble.footer.contents[0].action.uri = url
+      // bubble.footer.contents[0].action.uri = `https://www.google.com/maps/search/?api=1&query=${value['緯度']},${value['經度']}`
+      return bubble
+    })
+    if (bubbles.length === 0) {
+      await event.reply(`找不到關於「${keyword}」的公共藝術喔～換個地名試試看吧！`)
+      return
+    }
+
+    const result = await event.reply({
+      type: 'flex',
+      altText: '文化部公共藝術',
+      contents: {
+        type: 'carousel',
+        contents: bubbles,
+      },
+    })
+    console.log(result)
+
+    if (result.message) {
+      await event.reply('發生錯誤')
+
+      if (process.env.DEV === 'true') {
+        fs.writeFileSync(
+          '../dump/art.json',
+          JSON.stringify(
+            {
+              type: 'carousel',
+              contents: bubbles,
+            },
+            null,
+            2,
+          ),
+        )
+      }
+    }
+  } catch (error) {
+    console.error(error)
+    await event.reply('發生錯誤')
+  }
+}
