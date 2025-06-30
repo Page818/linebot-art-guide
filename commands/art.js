@@ -40,7 +40,7 @@ import fs from 'fs'
 
 export default async (event, keyword = null) => {
   try {
-    const { data } = await axios.get('https://zero630proxy.onrender.com', {
+    const { data } = await axios.get('https://zero630proxy.onrender.com/proxy', {
       params: {
         url: 'https://publicartap.moc.gov.tw/data/api/artWork/openData',
       },
