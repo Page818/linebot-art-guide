@@ -1,20 +1,41 @@
-import axios from 'axios'
+import puppeteer from 'puppeteer'
+// import axios from 'axios'
 import { distance } from '../utils/distance.js'
 import template from '../templates/art.js'
 import fs from 'fs'
 
+async function fetchArtDataWithPuppeteer() {
+  const browser = await puppeteer.launch({
+    headless: true,
+    args: ['--no-sandbox', '--disable-setuid-sandbox'],
+  })
+  try {
+    const page = await browser.newPage()
+    await page.goto('https://publicartap.moc.gov.tw/data/api/artWork/openData', {
+      waitUntil: 'networkidle2',
+    })
+    const content = await page.evaluate(() => document.body.textContent)
+    return JSON.parse(content)
+  } finally {
+    await browser.close()
+  }
+}
+
 export default async (event, keyword = null) => {
   try {
-    const { data } = await axios.get('https://publicartap.moc.gov.tw/data/api/artWork/openData', {
-      headers: {
-        'User-Agent':
-          'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/115.0.0.0 Safari/537.36',
-        Accept: 'application/json, text/plain, */*',
-        'Accept-Language': 'zh-TW,zh;q=0.9,en;q=0.8',
-        Referer: 'https://publicartap.moc.gov.tw/',
-        Origin: 'https://publicartap.moc.gov.tw',
-      },
-    })
+    // const { data } = await axios.get('https://publicartap.moc.gov.tw/data/api/artWork/openData', {
+    //   headers: {
+    //     'User-Agent':
+    //       'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/115.0.0.0 Safari/537.36',
+    //     Accept: 'application/json, text/plain, */*',
+    //     'Accept-Language': 'zh-TW,zh;q=0.9,en;q=0.8',
+    //     Referer: 'https://publicartap.moc.gov.tw/',
+    //     Origin: 'https://publicartap.moc.gov.tw',
+    //   },
+    // })
+
+    const data = await fetchArtDataWithPuppeteer()
+
     let filtered = []
 
     if (keyword) {
