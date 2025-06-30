@@ -5,7 +5,16 @@ import fs from 'fs'
 
 export default async (event, keyword = null) => {
   try {
-    const { data } = await axios.get('https://publicartap.moc.gov.tw/data/api/artWork/openData')
+    const { data } = await axios.get('https://publicartap.moc.gov.tw/data/api/artWork/openData', {
+      headers: {
+        'User-Agent':
+          'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/115.0.0.0 Safari/537.36',
+        Accept: 'application/json, text/plain, */*',
+        'Accept-Language': 'zh-TW,zh;q=0.9,en;q=0.8',
+        Referer: 'https://publicartap.moc.gov.tw/',
+        Origin: 'https://publicartap.moc.gov.tw',
+      },
+    })
     let filtered = []
 
     if (keyword) {
